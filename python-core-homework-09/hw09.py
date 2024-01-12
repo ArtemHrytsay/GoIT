@@ -42,7 +42,7 @@ def handler():
                     print(f'Name: {name}, phone: {number}')
             else:
                 print('The list is empty')
-        elif command in ("good bye", "close", "exit"):
+        elif command in ("good bye", "close", "exit", "."):
             print("Good bye!")
             bot = False
         else:
