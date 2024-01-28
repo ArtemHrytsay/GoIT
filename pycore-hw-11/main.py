@@ -8,6 +8,10 @@ class Field:
 
     def __str__(self):
         return str(self.value)
+    
+    def val(self, new_val):
+        self.value = new_val
+        return self.value
 
 
 class Name(Field):
@@ -16,8 +20,13 @@ class Name(Field):
 
 
 class Phone(Field):
-    def __init__(self, value):
-        super().__init__(value)
+    # def __init__(self, value):
+    #     super().__init__(value)
+    #     self.validate()
+    @Field.value.setter
+    def val(self, new_value):
+        if not isinstance(new_value, str) or not new_value.isdigit():
+            raise ValueError("Phone is not correct.")
         self.validate()
 
     def validate(self):
@@ -68,7 +77,7 @@ class Record:
                 next_bitrthday = self.birthday.replace(year=date.today.year + 1)
                 return (next_bitrthday - self.birthday).days
             else:
-                return self.birthday.days - date.today().days
+                return (self.birthday - date.today()).days
     
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
