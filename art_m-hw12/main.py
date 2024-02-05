@@ -1,5 +1,7 @@
 from collections import UserDict
 from datetime import date, datetime
+import pickle
+
 
 
 class Field:
@@ -84,7 +86,8 @@ class Record:
 
 
 class AddressBook(UserDict):
-    def __init__(self):
+    def __init__(self, file="adress_book.bin"):
+        self.file = file
         self.record = dict()
         super().__init__()
 
@@ -109,3 +112,19 @@ class AddressBook(UserDict):
                 yield records
                 counter = 0
                 records = list()
+
+    def save_data(self):
+        with open(self.file, "wb") as file:
+            pickle.dump(dict(self.data), file)
+
+    def load_data(self):
+        with open(self.file, "rb") as file:
+            self.data.update(pickle.load(file))
+
+    def find_by_string(self, string: str):
+        matches = list()
+
+        matches.extend(match_phone for match_phone in self.data.values() if string in match_phone.phone.value)
+        matches.extend(match_name for match_name in self.data.values() if string.lower() in match_name.name.value.lower())
+       
+        return matches
