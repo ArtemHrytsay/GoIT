@@ -118,7 +118,7 @@ def remove_empty_folders(path):
 
 def main(folder_path):
     print(folder_path)
-    scan.scan(folder_path)
+    scan(folder_path)
 
     for file in image_files:
         handle_file(file, folder_path, 'images')
