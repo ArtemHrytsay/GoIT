@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from collections import UserDict
 from itertools import islice
 import os
@@ -70,6 +70,7 @@ class Email(Field):
 class Birthday(Field):
     def __init__(self, birthday):
         super().__init__(birthday)
+        self.__value = datetime.strptime(birthday, "%d.%m.%Y") if birthday else None
 
     def is_valid(self, birthday):
         try:
@@ -79,26 +80,8 @@ class Birthday(Field):
         else:
             return True, None
 
-    @classmethod
-    def congratulate(cls, address_book, days_ahead):
-        current_date = datetime.now()
-        future_date = current_date + timedelta(days=days_ahead)
-
-        congratulation_list = []
-
-        for record in address_book.data.values():
-            days_to_birthday = record.days_to_birthday()
-            if days_to_birthday is not None and days_to_birthday == days_ahead:
-                congratulation_list.append(record)
-
-        if congratulation_list:
-            result = f'Congratulations to the following contacts, whose birthday is in {days_ahead} days:\n'
-            for record in congratulation_list:
-                result += f'{record.name.value} - Birthday: {record.birthday.value}\n'
-        else:
-            result = f'No contacts have birthdays in {days_ahead} days'
-
-        return result
+    def __str__(self):
+        return self.__value.strftime("%d.%m.%Y") if self.__value else ""
 
 
 class Address(Field):
@@ -106,7 +89,8 @@ class Address(Field):
         super().__init__(address)
 
     def is_valid(self, address):
-
+        if len(address) > 25:
+            return False, f'Address too long "{address}"! Max length 25 symbols'
         return True, None
 
 
@@ -170,13 +154,23 @@ class Record:
             next_birthday = datetime(now.year + 1, birthday.month, birthday.day)
         return (next_birthday - now).days
 
+    def is_in_range(self, n):
+        days_to_birthday = self.days_to_birthday()
+        return 0 <= days_to_birthday <= n
+
     def __str__(self):
-        text_view = f"Contact name: {self.name.value}; phones: {', '.join(p.value for p in self.phones)}"
+        text_view = f"Contact name: {self.name.value}\nPhones: {', '.join(p.value for p in self.phones)}"
+
         if self.email:
-            text_view += f'; email: {self.email.value}' if self.email else ''
-        text_view += '; days to birthday: ' + str(self.days_to_birthday()) if self.birthday else ''
+            text_view += f'\nEmail: {self.email.value}'
+
+        if self.birthday:
+            text_view += f'\nDays to birthday: {self.days_to_birthday()}'
+
         if self.address:
-            text_view += f'; address: {self.address.value}' if self.address else ''
+            text_view += f'\nAddress: {self.address.value}'
+
+        text_view += '\n'
 
         return text_view
 
@@ -220,9 +214,13 @@ class AddressBook(UserDict):
         for phone in record.phones:
             if not isinstance(phone, Phone):
                 return False
+        if record.email and not isinstance(record.email, Email):
+            return False
         if record.birthday:
             if not isinstance(record.birthday, Birthday):
                 return False
+        if record.address and not isinstance(record.address, Address):
+            return False
         return True
 
     def add_record(self, record):
