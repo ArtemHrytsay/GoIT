@@ -38,14 +38,16 @@ async def request(session, rate_date):
             logging.info(e)
 
 
-async def main() -> None:
+async def main():
     start = datetime.now()
 
     coroutines = list()
     results = list()
 
     async with aiohttp.ClientSession() as session:
-
+        if int(sys.argv[1]) > 10:
+            logging.warning("Max number of days you can fetch is 10")
+            
         rate_date = date.today() - timedelta(days=sys.argv[1])
         while rate_date <= date.today():
             logging.info(rate_date)
