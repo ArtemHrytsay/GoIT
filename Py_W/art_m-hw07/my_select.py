@@ -1,135 +1,63 @@
-import sqlalchemy.sql.functions as func
+from sqlalchemy import func, desc
 
-from sqlalchemy import func, desc, and_, true
-from main import Connection
-
-from models import Group, Student, Teacher, Discipline, Grade
+from config.models import Teacher, Group, Student, Discipline ,Grade
+from config.db import session
 
 
-def select_01(criterion = None, limit = 5):
-    "First five studens with highest average grade."
-    result = Connection.session().query(
-        Student.first_name,
-        Student.last_name,
-        func.round(func.avg(Grade.grade), 2).label('average_grade'),
-        func.count('*').label("count")
-    ).select_from(Grade).join(Student)\
-        .filter(criterion if id(criterion) != id(False) else true())\
-        .group_by(Student.id)\
-        .order_by(desc('average_grade'))\
-        .limit(limit)
+def select_01():
+    result = session.query(Student.id, Student.fullname, func.round(func.avg(Grade.grade), 2).label('average_grade')) \
+        .select_from(Student).join(Grade).group_by(Student.id).order_by(desc('average_grade')).limit(5).all()
     return result
 
-def select_02(criterion = Discipline.id == 1, limit = 1):
-    "First student with highest average grade by discipline."
-    result = Connection.session().query(
-        Discipline.name,
-        Student.first_name,
-        Student.last_name,
-        func.round(func.avg(Grade.grade), 2).label('average_grade'),
-        func.count('*').label("count"),
-    ).select_from(Grade).join(Student).join(Discipline)\
-        .filter(criterion if id(criterion) != id(False) else true())\
-        .group_by(Discipline.name, Student.id)\
-        .order_by(desc('average_grade'))\
-        .limit(limit)
+
+def select_02():
+    result = session.query(Student.id, Student.fullname, func.round(func.avg(Grade.grade), 2).label('average_grade')) \
+        .select_from(Grade).join(Student).filter(Grade.disciplines_id == 1).group_by(Student.id).order_by(desc('average_grade')).limit(1).all()
     return result
 
-def select_03(criterion = Discipline.id == 1, limit = None):
-    "Average grade in groups by discipline."
-    result = Connection.session().query(
-        Group.name,
-        Discipline.id,
-        Discipline.name,
-        func.round(func.avg(Grade.grade), 2).label('average_grade'),
-        func.count('*').label("count")
-    ).select_from(Grade).join(Student).join(Group).join(Discipline)\
-        .filter(criterion if id(criterion) != id(False) else true())\
-        .group_by(Group.id, Group.name, Discipline.id, Discipline.name)\
-        .order_by(Group.id, Discipline.id)\
-        .limit(limit)
+def select_03():
+    result = session.query(Teacher.fullname, Discipline.name ) \
+        .select_from(Teacher).join(Discipline).filter(Teacher.id == 5).all()
     return result
 
-def select_04(criterion = None, limit = None):
-    "Average grade."
-    result = Connection.session().query(
-        func.round(func.avg(Grade.grade), 2).label('average_grade')
-    ).select_from(Grade)\
-    .limit(limit)
+def select_06():
+    result = session.query(Group.name, Student.fullname ) \
+        .select_from(Group).join(Student).filter(Group.id == 2).all()
     return result
 
-def select_05(criterion = None, limit = None):
-    "Disciplines taught by the teacher."
-    result = Connection.session().query(
-        Teacher.first_name,
-        Teacher.last_name,
-        Discipline.name
-    ).select_from(Teacher).join(Discipline)\
-        .filter(criterion if id(criterion) != id(False) else true())\
-        .limit(limit)
+def select_07():
+    result = session.query(Student.fullname, Group.name,Grade.grade,Discipline.name ) \
+        .select_from(Student).join(Grade).join(Group).join(Discipline).filter(Grade.disciplines_id == 2,Group.id == 2).all()
     return result
 
-def select_06(criterion = Group.id == 1, limit = None):
-    "Students in the group."
-    result = Connection.session().query(
-        Group.name,
-        Student.first_name,
-        Student.last_name
-    ).select_from(Group).join(Student)\
-        .filter(criterion if id(criterion) != id(False) else true())\
-        .limit(limit)
+
+def select_08():
+    result = session.query(Teacher.fullname, Discipline.name, func.round(func.avg(Grade.grade), 2).label('average_grade')) \
+        .select_from(Teacher).join(Discipline).join(Grade).filter(Teacher.id == 4).group_by(Discipline.name,Teacher.fullname).order_by(desc('average_grade')).all()
     return result
 
-def select_07(criterion = and_(Discipline.id == 1, Group.id == 1), limit = None):
-    "Grades of group by discipline."
-    result = Connection.session().query(
-        Group.name,
-        Discipline.name,
-        Student.first_name,
-        Student.last_name,
-        Grade.grade,
-        Grade.datetime
-    ).select_from(Grade).join(Discipline).join(Student).join(Group)\
-        .filter(criterion if id(criterion) != id(False) else true())\
-        .limit(limit)
+
+def select_09():
+    result = session.query(Student.fullname, Discipline.name) \
+        .select_from(Discipline).join(Grade).join(Student).filter(Student.id == 2).group_by(Discipline.name,Student.fullname).all()
     return result
 
-def select_08(criterion = Teacher.id == 1, limit = None):
-    "Average grade given by teacher for his disciplines."
-    result = Connection.session().query(
-        Discipline.name,
-        Teacher.first_name,
-        Teacher.last_name,
-        func.round(func.avg(Grade.grade), 2).label('average_grade'),
-        func.count('*').label("count")
-    ).select_from(Grade).join(Discipline).join(Teacher)\
-        .group_by(Teacher.id, Discipline.id)\
-        .filter(criterion if id(criterion) != id(False) else true())\
-        .limit(limit)
+
+def select_10():
+    result = session.query(Student.fullname, Discipline.name, Teacher.fullname ) \
+        .select_from(Discipline).join(Grade).join(Student).join(Teacher).filter(Student.id == 2, Teacher.id == 4) \
+            .group_by(Discipline.name,Student.fullname,Teacher.fullname ).all()
     return result
 
-def select_09(criterion = Student.id == 1, limit = None):
-    "Disciplines by the student."
-    result = Connection.session().query(
-        Student.first_name,
-        Student.last_name,
-        Discipline.name,
-    ).select_from(Grade).join(Discipline).join(Student)\
-        .group_by(Student.id, Discipline.id)\
-        .filter(criterion if id(criterion) != id(False) else true())\
-        .limit(limit)
-    return result
 
-def select_10(criterion = and_(Teacher.id == 1, Student.id == 1), limit = None):
-    "Disciplines teacher teachs to student."
-    result = Connection.session().query(
-        Teacher.first_name,
-        Teacher.last_name,
-        Discipline.name,
-        Student.first_name,
-        Student.last_name
-    ).select_from(Grade).join(Discipline).join(Teacher).join(Student)\
-        .group_by(Teacher.id, Discipline.id, Student.id)\
-        .filter(criterion if id(criterion) != id(False) else true())\
-        .limit(limit)
-    return result
+if __name__ == '__main__':
+    print(select_01())
+    #print(select_02())
+    #print(select_03())
+    #print(select_04())
+    #print(select_05())
+    #print(select_06())
+    #print(select_07())
+    #print(select_08())
+    #print(select_09())
+    # print(select_10())
