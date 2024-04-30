@@ -1,4 +1,4 @@
-import json, scrapy, connect
+import json, scrapy
 
 from itemadapter import ItemAdapter
 from scrapy.crawler import CrawlerProcess
