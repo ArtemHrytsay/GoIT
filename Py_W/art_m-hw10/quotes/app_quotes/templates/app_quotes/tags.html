@@ -1,0 +1,26 @@
+
+{% extends "app_quotes/base.html" %}
+
+{% block content %}
+
+    <h1>Tag: {{tag}}</h1>
+    <div class="row">
+        {% for quote in quotes %}
+            <div class="card">
+                <h5 class="card-header">{{quote.quote}}</h5>
+                <div class="card-body">
+                    <p class="card-text"><strong>Author: </strong>{{quote.author}}
+                        <a href="{% url 'app_quotes:authors' %}?id={{ quote.author_id }}">(about)</a>
+                    </p>
+                    <p class="card-text">Tags: {% for tag in quote.tags %}
+                        <a href="{% url 'app_quotes:tags' %}?tag={{ tag }}"</p>
+                        {{ tag }}
+                        </a>
+                        {% endfor %}
+                </div>
+            </div>
+        <p>&nbsp;</p>
+        {% endfor %}
+    </div>
+
+{% endblock %}
