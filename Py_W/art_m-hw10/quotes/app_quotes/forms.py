@@ -1,6 +1,6 @@
 from django.forms import DateField, DateInput, HiddenInput, IntegerField, ModelForm, CharField, TextInput, Select, \
     ModelChoiceField, JSONField, Textarea
-from .models import Author, Quote
+from .models import Author, Quote, Tag
 
 
 class AuthorForm(ModelForm):
@@ -13,6 +13,14 @@ class AuthorForm(ModelForm):
     class Meta:
         model  = Author
         fields = ['fullname', 'born_date', 'born_location', 'description']
+
+
+class TagForm(ModelForm):
+    name = CharField(min_length=3, max_length=50, required=True, widget=TextInput())
+    
+    class Meta:
+        model = Tag
+        fields = ['name']
 
 
 class QuoteForm(ModelForm):

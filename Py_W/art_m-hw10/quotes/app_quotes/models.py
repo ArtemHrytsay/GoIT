@@ -16,11 +16,19 @@ class Author(models.Model):
         return f"{self.fullname}"
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+
+    def __str__(self):
+        return f"{self.name}"
+    
+
 class Quote(models.Model):
     id     = models.AutoField(primary_key=True)
     quote  = models.TextField(unique=True, null=False)
     author = models.ForeignKey(Author, to_field="id", on_delete=models.CASCADE)
-    tags   = ArrayField(models.CharField(max_length=50), null=False, blank=True)
+    tags   = models.ManyToManyField(Tag)
 
     def __str__(self):
         return f"{self.tags}"

@@ -1,8 +1,8 @@
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 
-from .forms import AuthorForm, QuoteForm
-from .models import Author, Quote
+from .forms import AuthorForm, QuoteForm, TagForm
+from .models import Author, Quote, Tag
 
 # Create your views here.
 
@@ -27,7 +27,7 @@ def tags(request):
     else:
         quotes = Quote.objects.all()
 
-    return render(request, 'app_quotes/tags.html', context={'quotes': quotes, 'tag': search_tag})
+    return render(request, 'app_quotes/tags.html', {'form': TagForm()}, context={'quotes': quotes, 'tag': search_tag})
 
 
 @login_required
