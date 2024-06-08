@@ -1,0 +1,21 @@
+
+{% extends "app_quotes/base.html" %}
+
+{% block content %}
+
+    <h1>About authors</h1>
+    <div class="row">
+
+        {% for author in authors %}
+            <div class="card">
+                <h5 class="card-header">{{author.fullname}}</h5>
+                <div class="card-body">
+                    <p class="card-text"><strong>Born: </strong>{{author.born_date}} in {{author.born_location}}</p>
+                    <p class="card-text">{{author.description}}</p>
+                </div>
+            </div>
+        <p>&nbsp;</p>
+        {% endfor %}
+    </div>
+
+{% endblock %}

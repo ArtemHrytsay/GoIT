@@ -1,0 +1,42 @@
+{% extends "app_quotes/base.html" %}
+
+{% block content %}
+
+<form action="{% url 'app_quotes:add_quote' %}" method="POST" enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+        <div class="row">
+          <div>
+            <div class="card-body" style="width: 50%;">
+
+              <h1>Add quote</h1>
+              {{form_quote.id}}
+
+              <div class="mb-3">
+                <label class="form-label">Quote</label>
+                {{form_quote.quote}}
+                <span>{{ form_quote.errors.quote }}</span>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Author</label>
+                {{form_quote.author}}
+                <span>{{ form_quote.errors.author }}</span>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Tags</label>
+                {{form_quote.tags}}
+                <span>{{ form_quote.errors.tags }}</span>
+              </div>
+
+            <button type="submit" class="btn btn-secondary">Save Changes</button>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+</form>  
+
+{% endblock %}

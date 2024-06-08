@@ -1,0 +1,52 @@
+{% extends "app_quotes/base.html" %}
+
+{% block content %}
+
+<form action="{% url 'app_quotes:add_author' %}" method="POST" enctype="multipart/form-data">
+  
+  {% csrf_token %}
+
+    <div class="row">
+      <div>
+        <div class="card-body" style="width: 50%">
+          <h1>Add author</h1>
+
+          {{form_author.id}}
+
+          <div class="mb-3">
+            <label class="form-label">Fullname</label>
+            {{form_author.fullname}}
+            <span>{{ form_author.errors.fullname }}</span>
+          </div>
+
+          <div class="mb-3">
+            <form>
+              <div class="form-group">
+                <label for="inputDate" class="form-label">Was born</label>
+                {{ form_author.born_date }}
+                <span>{{ form_author.errors.born_date }}</span>
+              </div>
+            </form>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Born in</label>
+            {{form_author.born_location}}
+            <span>{{ form_author.errors.born_location }}</span>
+          </div>
+
+          <div class="mb-3">
+              <label class="form-label">Description</label>
+              {{form_author.description}}
+              <span>{{ form_author.errors.description }}</span>
+          </div>
+
+        <button type="submit" class="btn btn-secondary">Save Changes</button>
+        <button type="reset" class="btn btn-secondary">Reset</button>
+        </div>
+      </div>      
+    </div>
+
+</form> 
+
+{% endblock %}
